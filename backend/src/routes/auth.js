@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const { z } = require('zod');
 const { Usuario } = require('../models');
+const { requireAuth } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -57,6 +58,19 @@ router.post('/login', limiter, async (req, res) => {
       nombre: user.nombre,
       rol: user.rol,
       debe_cambiar_password: user.debe_cambiar_password,
+    },
+  });
+});
+
+router.get('/me', requireAuth, (req, res) => {
+  const u = req.user;
+  res.json({
+    usuario: {
+      id: u.id,
+      nombre: u.nombre,
+      rol: u.rol,
+      sede_id: u.sede_id,
+      debe_cambiar_password: u.debe_cambiar_password,
     },
   });
 });

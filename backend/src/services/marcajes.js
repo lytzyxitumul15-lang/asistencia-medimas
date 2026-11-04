@@ -1,10 +1,13 @@
-const { UniqueConstraintError } = require('sequelize');
+const { UniqueConstraintError, Op } = require('sequelize');
 const { sequelize, Marcaje, Sede } = require('../models');
 const { validarUbicacion } = require('./geocerca');
 const { calcularHash } = require('./hashChain');
+const { validarSecuencia } = require('./secuencia');
+const { inicioDiaGuatemala } = require('./fechas');
 
 const TIPOS = ['entrada', 'salida', 'salida_temporal', 'regreso'];
 const NS_MARCAJES = 1; // espacio de nombres del bloqueo de la cadena
+const DIA_MS = 24 * 60 * 60 * 1000;
 
 const MENSAJES = {
   coordenadas_invalidas: 'No se pudo leer tu ubicación',
@@ -78,6 +81,29 @@ async function registrarMarcaje(user, entrada) {
       });
 
       const hora = new Date();
+
+      // Regla de secuencia: se evalúa dentro del bloqueo
+      const inicioDia = inicioDiaGuatemala(hora);
+      const ultimoDelDia = await Marcaje.findOne({
+        where: {
+          usuario_id: user.id,
+          estado_validacion: { [Op.ne]: 'rechazado' },
+          hora_efectiva: {
+            [Op.gte]: inicioDia,
+            [Op.lt]: new Date(inicioDia.getTime() + DIA_MS),
+          },
+        },
+        order: [['hora_efectiva', 'DESC'], ['id', 'DESC']],
+        attributes: ['tipo'],
+        transaction: t,
+      });
+      const seq = validarSecuencia(ultimoDelDia ? ultimoDelDia.tipo : null, tipo);
+      if (!seq.ok) {
+        throw new ErrorNegocio('secuencia_invalida', seq.mensaje, 409, {
+          estado_actual: seq.estado_actual,
+        });
+      }
+
       const datos = {
         empresa_id: user.empresa_id,
         usuario_id: user.id,

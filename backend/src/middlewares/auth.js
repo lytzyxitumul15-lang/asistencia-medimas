@@ -20,7 +20,7 @@ async function requireAuth(req, res, next) {
 
   try {
     const user = await Usuario.findByPk(payload.sub);
-    if (!user || !user.activo) {
+    if (!user || user.estado === 'inactivo') {
       return res.status(401).json({ error: 'Usuario inactivo o inexistente' });
     }
     req.user = user;
@@ -28,6 +28,16 @@ async function requireAuth(req, res, next) {
   } catch (e) {
     next(e);
   }
+}
+
+function requireActivo(req, res, next) {
+  if (req.user.estado !== 'activo') {
+    return res.status(403).json({
+      error: 'Tu cuenta está en revisión. El administrador debe aprobarla antes de que puedas marcar',
+      codigo: 'cuenta_pendiente',
+    });
+  }
+  next();
 }
 
 function requireRol(...roles) {
@@ -41,4 +51,4 @@ function requireRol(...roles) {
   };
 }
 
-module.exports = { requireAuth, requireRol };
+module.exports = { requireAuth, requireActivo, requireRol };

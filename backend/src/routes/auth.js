@@ -41,8 +41,8 @@ router.post('/login', limiter, async (req, res) => {
     user ? user.password_hash : HASH_FALSO
   );
 
-  if (!user || !coincide || !user.activo) {
-    return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+  if (!user || !coincide || user.estado === 'inactivo') {
+      return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
   }
 
   const token = jwt.sign(
@@ -57,6 +57,7 @@ router.post('/login', limiter, async (req, res) => {
       id: user.id,
       nombre: user.nombre,
       rol: user.rol,
+      estado: user.estado,
       debe_cambiar_password: user.debe_cambiar_password,
     },
   });
@@ -69,6 +70,7 @@ router.get('/me', requireAuth, (req, res) => {
       id: u.id,
       nombre: u.nombre,
       rol: u.rol,
+      estado: u.estado,
       sede_id: u.sede_id,
       debe_cambiar_password: u.debe_cambiar_password,
     },

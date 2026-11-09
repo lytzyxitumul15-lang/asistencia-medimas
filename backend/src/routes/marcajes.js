@@ -1,7 +1,7 @@
 const express = require('express');
 const { Op } = require('sequelize');
 const { z } = require('zod');
-const { requireAuth } = require('../middlewares/auth');
+const { requireAuth, requireActivo } = require('../middlewares/auth');
 const { Marcaje, MotivoSalida, Dispositivo } = require('../models');
 const {
   registrarMarcaje,
@@ -10,7 +10,7 @@ const {
 } = require('../services/marcajes');
 
 const router = express.Router();
-router.use(requireAuth);
+router.use(requireAuth, requireActivo);
 
 const crearSchema = z.object({
   tipo: z.enum(TIPOS),

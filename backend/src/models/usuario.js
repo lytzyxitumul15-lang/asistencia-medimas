@@ -11,12 +11,14 @@ module.exports = (sequelize) =>
       email: { type: DataTypes.STRING(200), allowNull: true },
       password_hash: { type: DataTypes.STRING(100), allowNull: false },
       rol: { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'empleado' },
-      activo: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+      estado: { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'activo' },
       debe_cambiar_password: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
+      aprobado_por: { type: DataTypes.INTEGER, allowNull: true },
+      aprobado_en: { type: DataTypes.DATE, allowNull: true },
     },
     {
       tableName: 'usuarios',

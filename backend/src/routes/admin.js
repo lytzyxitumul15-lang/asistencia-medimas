@@ -6,8 +6,10 @@ const {
   requireRol,
 } = require('../middlewares/auth');
 const {
-  sequelize, Usuario, Sede, Turno, AsignacionTurno,
+  sequelize, Usuario, Sede, Turno, AsignacionTurno, Marcaje, Bitacora,
 } = require('../models');
+const { verificarCadena } = require('../services/hashChain');
+const { verificarCadenaBitacora } = require('../services/hashBitacora');
 const { ErrorNegocio } = require('../services/marcajes');
 const { registrarBitacora } = require('../services/bitacora');
 const { hoyGuatemala } = require('../services/fechas');
@@ -180,6 +182,22 @@ router.post('/usuarios/:id/rechazar', async (req, res) => {
   });
 
   res.json({ ok: true, usuario: { id: rechazado.id, estado: rechazado.estado } });
+});
+
+router.get('/auditoria/verificar', async (req, res) => {
+  const empresa_id = req.user.empresa_id;
+  const [marcajes, bitacora] = await Promise.all([
+    Marcaje.findAll({ where: { empresa_id }, order: [['id', 'ASC']], raw: true }),
+    Bitacora.findAll({ where: { empresa_id }, order: [['id', 'ASC']], raw: true }),
+  ]);
+  const rm = verificarCadena(marcajes);
+  const rb = verificarCadenaBitacora(bitacora);
+  res.json({
+    ok: rm.ok && rb.ok,
+    marcajes: { registros: marcajes.length, ...rm },
+    bitacora: { registros: bitacora.length, ...rb },
+    verificado_en: new Date().toISOString(),
+  });
 });
 
 module.exports = router;

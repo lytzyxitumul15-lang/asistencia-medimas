@@ -4,6 +4,7 @@ const cors = require('cors');
 const sequelize = require('./config/db');
 const authRoutes = require('./routes/auth');
 const marcajesRoutes = require('./routes/marcajes');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get('/health', async (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/marcajes', marcajesRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });

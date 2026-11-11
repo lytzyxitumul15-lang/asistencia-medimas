@@ -9,4 +9,9 @@ function inicioDiaGuatemala(fecha = new Date()) {
   );
 }
 
-module.exports = { inicioDiaGuatemala, OFFSET_GT_MS };
+// Fecha de hoy en Guatemala como 'AAAA-MM-DD'
+function hoyGuatemala(fecha = new Date()) {
+  return new Date(fecha.getTime() - OFFSET_GT_MS).toISOString().slice(0, 10);
+}
+
+module.exports = { inicioDiaGuatemala, hoyGuatemala, OFFSET_GT_MS };

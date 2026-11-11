@@ -12,9 +12,9 @@ const MOTIVOS = [
 
 // dias_semana: 1 = lunes ... 7 = domingo
 const TURNOS = [
-  { nombre: 'Lunes a viernes 8:00-17:00', entrada: '08:00', salida: '17:00', dias: [1, 2, 3, 4, 5], usuario: 'empleado1' },
-  { nombre: 'Lunes a viernes 11:00-20:00', entrada: '11:00', salida: '20:00', dias: [1, 2, 3, 4, 5], usuario: 'empleado2' },
-  { nombre: 'Fin de semana 10:00-20:00', entrada: '10:00', salida: '20:00', dias: [6, 7], usuario: 'empleado3' },
+  { nombre: 'Lunes a viernes 8:00-17:00', entrada: '08:00', salida: '17:00', dias: [1, 2, 3, 4, 5], email: 'empleado1@example.com' },
+  { nombre: 'Lunes a viernes 11:00-20:00', entrada: '11:00', salida: '20:00', dias: [1, 2, 3, 4, 5], email: 'empleado2@example.com' },
+  { nombre: 'Fin de semana 10:00-20:00', entrada: '10:00', salida: '20:00', dias: [6, 7], email: 'empleado3@example.com' },
 ];
 
 async function main() {
@@ -44,14 +44,14 @@ async function main() {
     console.log(`Turno ${t.nombre}: ${tNuevo ? 'creado' : 'ya existía'}`);
 
     const user = await Usuario.findOne({
-      where: { empresa_id: empresa.id, usuario: t.usuario },
+      where: { empresa_id: empresa.id, email: t.email },
     });
-    if (!user) throw new Error(`No existe el usuario ${t.usuario}`);
+    if (!user) throw new Error(`No existe el usuario ${t.email}`);
 
     const [, aNueva] = await AsignacionTurno.findOrCreate({
       where: { usuario_id: user.id, turno_id: turno.id, vigente_desde: '2026-11-01' },
     });
-    console.log(`  Asignado a ${t.usuario}: ${aNueva ? 'creado' : 'ya existía'}`);
+    console.log(`  Asignado a ${t.email}: ${aNueva ? 'creado' : 'ya existía'}`);
   }
 }
 

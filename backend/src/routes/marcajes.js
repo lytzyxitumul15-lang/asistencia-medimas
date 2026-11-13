@@ -3,11 +3,9 @@ const { Op } = require('sequelize');
 const { z } = require('zod');
 const { requireAuth, requireActivo } = require('../middlewares/auth');
 const { Marcaje, MotivoSalida, Dispositivo } = require('../models');
-const {
-  registrarMarcaje,
-  ErrorNegocio,
-  TIPOS,
-} = require('../services/marcajes');
+const {registrarMarcaje, ErrorNegocio, TIPOS,} = require('../services/marcajes');
+const { recalcularJornada } = require('../services/jornadas');
+const { hoyGuatemala } = require('../services/fechas');
 
 const router = express.Router();
 router.use(requireAuth, requireActivo);
@@ -66,6 +64,22 @@ router.post('/', async (req, res) => {
     if (!creado) await disp.update({ ultimo_uso: new Date() });
   }
 
+    // La jornada es un dato derivado: si el cálculo falla, el marcaje ya quedó guardado
+  let jornada = null;
+  if (!duplicado) {
+    try {
+      const fecha = hoyGuatemala(new Date(marcaje.hora_efectiva));
+      const j = await recalcularJornada(user, fecha);
+      jornada = {
+        fecha,
+        estado: j.estado,
+        minutos_retraso: j.minutos_retraso,
+      };
+    } catch (e) {
+      console.error('No se pudo actualizar la jornada:', e.message);
+    }
+  }
+
   res.status(duplicado ? 200 : 201).json({
     duplicado,
     marcaje: {
@@ -76,6 +90,7 @@ router.post('/', async (req, res) => {
       motivo_id: marcaje.motivo_id,
       motivo_texto: marcaje.motivo_texto,
     },
+    jornada,
   });
 });
 

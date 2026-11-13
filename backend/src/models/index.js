@@ -9,6 +9,7 @@ const Turno = require('./turno')(sequelize);
 const AsignacionTurno = require('./asignacionTurno')(sequelize);
 const Marcaje = require('./marcaje')(sequelize);
 const Bitacora = require('./bitacora')(sequelize);
+const Jornada = require('./jornada')(sequelize);
 
 Empresa.hasMany(Sede, { foreignKey: 'empresa_id' });
 Sede.belongsTo(Empresa, { foreignKey: 'empresa_id' });
@@ -42,6 +43,11 @@ Marcaje.belongsTo(Sede, { foreignKey: 'sede_id' });
 MotivoSalida.hasMany(Marcaje, { foreignKey: 'motivo_id' });
 Marcaje.belongsTo(MotivoSalida, { foreignKey: 'motivo_id' });
 
+Usuario.hasMany(Jornada, { foreignKey: 'usuario_id' });
+Jornada.belongsTo(Usuario, { foreignKey: 'usuario_id' });
+Turno.hasMany(Jornada, { foreignKey: 'turno_id' });
+Jornada.belongsTo(Turno, { foreignKey: 'turno_id' });
+
 module.exports = {
   sequelize,
   Empresa,
@@ -53,4 +59,5 @@ module.exports = {
   AsignacionTurno,
   Marcaje,
   Bitacora,
+  Jornada,
 };

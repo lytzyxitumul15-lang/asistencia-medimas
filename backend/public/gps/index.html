@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prueba de GPS</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 16px; max-width: 520px; }
+    button, input { font-size: 18px; padding: 12px; margin: 6px 0; width: 100%; box-sizing: border-box; }
+    pre { background: #f2f2f2; padding: 10px; white-space: pre-wrap; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Prueba de GPS</h1>
+  <p>1) Párate en el punto que será el centro y pulsa "Medir". 2) Pulsa "Fijar como centro". 3) Ve a otros puntos, escribe su nombre y mide.</p>
+  <input id="etiqueta" placeholder="Nombre del punto (puerta, fondo, bodega...)">
+  <button id="medir">Medir mi ubicación</button>
+  <button id="centro" disabled>Fijar la última medición como centro</button>
+  <button id="copiar">Copiar resultados</button>
+  <pre id="salida">Sin mediciones todavía.</pre>
+  <script src="gps.js"></script>
+</body>
+</html>
